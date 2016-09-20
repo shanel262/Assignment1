@@ -36,18 +36,22 @@ class Retrieve {
 		next.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(idRow < maxLength) idRow++;
-				ResultSet rs = load(idRow);
-				parseAndInsert(rs);
+				if(idRow < maxLength){
+					idRow++;
+					ResultSet rs = load(idRow);
+					parseAndInsert(rs, true);
+				}
 			}
 		});
 
 		previous.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(idRow > 1) idRow--;
-				ResultSet rs = load(idRow);
-				parseAndInsert(rs);
+				if(idRow > 1){
+					idRow--;
+					ResultSet rs = load(idRow);
+					parseAndInsert(rs, false);
+				}
 			}
 		});
 		
@@ -73,7 +77,7 @@ class Retrieve {
 					previous.setEnabled(false);
 					next.setEnabled(false);
 				}
-				else{
+				else if(!text1.getText().isEmpty() && !text2.getText().isEmpty()){
 					String query = "INSERT into web_members (id, name, lastname, email) values (" + (maxLength + 1) + ", \"" + text1.getText() + "\", \"" + text2.getText() + "\", \"" + text3.getText() + "\");";
 					print(query);
 					text0.setEnabled(true);
@@ -88,21 +92,64 @@ class Retrieve {
 						maxLength = length();
 						idRow = maxLength;
 						ResultSet rs = load(maxLength);
-						parseAndInsert(rs);
+						parseAndInsert(rs, true);
 					}
 					catch(Exception x){
 						maxLength = length();
 						ResultSet rs = load(maxLength);
-						parseAndInsert(rs);
+						parseAndInsert(rs, true);
 						print("Error: " + x);
 					}
+				}
+				else{
+					print("Please enter a full name");
+					text0.setEnabled(true);
+					previous.setEnabled(true);
+					next.setEnabled(true);
+					maxLength = length();
+					idRow = maxLength;
+					ResultSet rs = load(maxLength);
+					parseAndInsert(rs, true);
+					
+				}
+			}
+		});
+		
+		delete.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String query = "DELETE FROM `web_members` WHERE id=" + idRow;
+				try{
+					Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "root", "dbpass10");
+					Statement st = con.createStatement();
+					int res = st.executeUpdate(query);
+					if(res == 1) print("Delete successful");
+					else print("Delete unsuccessful");
+					maxLength = length();
+					idRow = maxLength;
+					if(maxLength != 0){
+						ResultSet rs = load(maxLength);
+						parseAndInsert(rs, false);						
+					}
+					else{
+						text0.setText(""); text1.setText(""); text2.setText(""); text3.setText("");
+					}
+				}
+				catch(Exception x){
+					maxLength = length();
+					ResultSet rs = load(maxLength);
+					parseAndInsert(rs, false);
+					print("Error: " + x);
 				}
 			}
 		});
 
-		ResultSet rs = load(idRow);
-		parseAndInsert(rs);
 		maxLength = length();
+		print("maxlength: " + maxLength);
+		if(maxLength != 0){
+			ResultSet rs = load(idRow);
+			parseAndInsert(rs, true);			
+		}
 		
 		f.setPreferredSize(new Dimension(700, 200));
 		JPanel master = new JPanel(new GridLayout(1, 2));
@@ -133,7 +180,8 @@ class Retrieve {
 		try{
 			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "root", "dbpass10"); //Change password to empty
 			Statement st = con.createStatement();
-			ResultSet rs = st.executeQuery("SELECT count(*) FROM web_members");
+//			ResultSet rs = st.executeQuery("SELECT count(*) FROM web_members"); //This doesn't work after deleting members that do not have the max id
+			ResultSet rs = st.executeQuery("SELECT * FROM web_members ORDER BY id DESC LIMIT 1");
 			if(rs.next()){
 				length = rs.getInt(1);
 			}
@@ -157,7 +205,7 @@ class Retrieve {
 		return rs;
 	}
 
-	public void parseAndInsert(ResultSet rs) {
+	public void parseAndInsert(ResultSet rs, boolean direction) { // direction == true means right. direction == false means left
 		try {
 			String name = "", email = "", lastname = "";
 			int id = 0;
@@ -167,11 +215,24 @@ class Retrieve {
 				email = rs.getString("email");
 				lastname = rs.getString("lastname");
 			}
-			String ID = Integer.toString(id);
-			text0.setText(ID);
-			text1.setText(name);
-			text2.setText(lastname);
-			text3.setText(email);
+			if(id == 0 && direction){
+				idRow = idRow++ <= maxLength ? idRow++ : idRow--;
+				rs = load(idRow);
+				parseAndInsert(rs, direction);
+			}
+			else if(id == 0 && !direction){
+				idRow = idRow-- > 0 ? idRow-- : idRow++;
+				rs = load(idRow);
+				parseAndInsert(rs, direction);
+			}
+			else{
+				print(name + " " + lastname + " " + email);
+				String ID = Integer.toString(id);
+				text0.setText(ID);
+				text1.setText(name);
+				text2.setText(lastname);
+				text3.setText(email);				
+			}
 		} catch (Exception x) {
 			print("Error: " + x);
 		}
