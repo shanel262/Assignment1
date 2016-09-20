@@ -18,6 +18,8 @@ class Retrieve {
 	JTextField text2 = new JTextField(20);
 	JButton previous = new JButton("Previous");
 	JButton next = new JButton("Next");
+	JButton exit = new JButton("Exit");
+	JButton insert = new JButton("Insert");
 
 	public static void main(String[] args) {
 		Retrieve main = new Retrieve();
@@ -46,11 +48,28 @@ class Retrieve {
 			}
 		});
 		
+		exit.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				print("Exiting");
+				System.exit(0);
+			}
+		});
+		
+		insert.addActionListener(new ActionListener() {
+			String name = "test", lastname = "lacey", email = "testl@gmail.com";
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String query = "INSERT into web_members (id, name, lastname, email) values (" + (idRow + 1) + ", '" + name + "', '" + lastname + "', '" + email + "');";
+				print(query);
+			}
+		});
+		
 		ResultSet rs = load(idRow);
 		parseAndInsert(rs);
-		length();
+		maxLength = length();
 		
-		JPanel p = new JPanel(new GridLayout(3, 3));
+		JPanel p = new JPanel(new GridLayout(4, 3));
 		p.add(label0);
 		p.add(label1);
 		p.add(label2);
@@ -59,24 +78,28 @@ class Retrieve {
 		p.add(text2);
 		p.add(previous);
 		p.add(next);
+		p.add(exit);
+		p.add(insert);
 		f.add(p);
 		f.setVisible(true);
 		f.pack();
 	}
 	
-	public void length(){
+	public int length(){
+		int length = 0;
 		try{
 			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "root", "dbpass10");
 			Statement st = con.createStatement();
 			ResultSet rs = st.executeQuery("SELECT count(*) FROM web_members");
 			if(rs.next()){
 				System.out.println("LENGTH: " + rs.getInt(1));	
-				maxLength = rs.getInt(1);
+				length = rs.getInt(1);
 			}
 		}
 		catch(Exception e){
 			print("Error: " + e);
 		}
+		return length;
 	}
 
 	public ResultSet load(int idReq) {
@@ -111,7 +134,7 @@ class Retrieve {
 			print("Error: " + x);
 		}
 	}
-
+	
 	public void print(String print) {
 		System.out.println(print);
 	}
