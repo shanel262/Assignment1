@@ -21,7 +21,8 @@ class Retrieve {
 	JButton previous = new JButton("Previous");
 	JButton next = new JButton("Next");
 	JButton exit = new JButton("Exit");
-	JButton insert = new JButton("Insert");
+	JButton add = new JButton("Add");
+	JButton delete = new JButton("Delete");
 
 	public static void main(String[] args) {
 		Retrieve main = new Retrieve();
@@ -58,7 +59,7 @@ class Retrieve {
 			}
 		});
 		
-		insert.addActionListener(new ActionListener() {
+		add.addActionListener(new ActionListener() {
 			String id = "", name = "", lastname = "", email = "";
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -103,20 +104,26 @@ class Retrieve {
 		parseAndInsert(rs);
 		maxLength = length();
 		
-		JPanel p = new JPanel(new GridLayout(3, 4));
-		p.add(label0);
-		p.add(label1);
-		p.add(label2);
-		p.add(label3);
-		p.add(text0);
-		p.add(text1);
-		p.add(text2);
-		p.add(text3);
-		p.add(previous);
-		p.add(next);
-		p.add(insert);
-		p.add(exit);
-		f.add(p);
+		f.setPreferredSize(new Dimension(700, 200));
+		JPanel master = new JPanel(new GridLayout(1, 2));
+		JPanel info = new JPanel(new GridLayout(4, 2));
+		JPanel buttons = new JPanel(new GridLayout(5, 1));
+		master.add(info);
+		master.add(buttons);
+		info.add(label0);
+		info.add(text0); 
+		info.add(label1);
+		info.add(text1);
+		info.add(label2);
+		info.add(text2);
+		info.add(label3);
+		info.add(text3);
+		buttons.add(previous);
+		buttons.add(next);
+		buttons.add(add);
+		buttons.add(delete);
+		buttons.add(exit);
+		f.add(master);
 		f.setVisible(true);
 		f.pack();
 	}
