@@ -12,10 +12,12 @@ class Retrieve {
 	JFrame f = new JFrame();
 	JLabel label0 = new JLabel("ID: ");
 	JLabel label1 = new JLabel("Name: ");
-	JLabel label2 = new JLabel("Address: ");
+	JLabel label2 = new JLabel("Lastname: ");
+	JLabel label3 = new JLabel("Email: ");
 	JTextField text0 = new JTextField(20);
 	JTextField text1 = new JTextField(20);
 	JTextField text2 = new JTextField(20);
+	JTextField text3 = new JTextField(20);
 	JButton previous = new JButton("Previous");
 	JButton next = new JButton("Next");
 	JButton exit = new JButton("Exit");
@@ -57,29 +59,65 @@ class Retrieve {
 		});
 		
 		insert.addActionListener(new ActionListener() {
-			String name = "test", lastname = "lacey", email = "testl@gmail.com";
+			String id = "", name = "", lastname = "", email = "";
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String query = "INSERT into web_members (id, name, lastname, email) values (" + (idRow + 1) + ", '" + name + "', '" + lastname + "', '" + email + "');";
-				print(query);
+				if(previous.isEnabled()){
+					text0.setText(id);
+					text1.setText(name);
+					text2.setText(lastname);
+					text3.setText(email);
+					maxLength = length();
+//					text0.setVisible(false);
+					text0.setEnabled(false);
+					previous.setEnabled(false);
+					next.setEnabled(false);
+				}
+				else{
+					String query = "INSERT into web_members (id, name, lastname, email) values (" + (maxLength + 1) + ", \"" + text1.getText() + "\", \"" + text2.getText() + "\", \"" + text3.getText() + "\");";
+					print(query);
+//					text0.setVisible(true);
+					text0.setEnabled(true);
+					previous.setEnabled(true);
+					next.setEnabled(true);
+					try{
+						Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "root", "dbpass10");
+						Statement st = con.createStatement();
+						int res = st.executeUpdate(query);
+						if(res == 1) print("Update successful");
+						else print("Update unsuccessful");
+						maxLength = length();
+						idRow = maxLength;
+						ResultSet rs = load(maxLength);
+						parseAndInsert(rs);
+					}
+					catch(Exception x){
+						maxLength = length();
+						ResultSet rs = load(maxLength);
+						parseAndInsert(rs);
+						print("Error: " + x);
+					}
+				}
 			}
 		});
-		
+
 		ResultSet rs = load(idRow);
 		parseAndInsert(rs);
 		maxLength = length();
 		
-		JPanel p = new JPanel(new GridLayout(4, 3));
+		JPanel p = new JPanel(new GridLayout(3, 4));
 		p.add(label0);
 		p.add(label1);
 		p.add(label2);
+		p.add(label3);
 		p.add(text0);
 		p.add(text1);
 		p.add(text2);
+		p.add(text3);
 		p.add(previous);
 		p.add(next);
-		p.add(exit);
 		p.add(insert);
+		p.add(exit);
 		f.add(p);
 		f.setVisible(true);
 		f.pack();
@@ -88,11 +126,10 @@ class Retrieve {
 	public int length(){
 		int length = 0;
 		try{
-			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "root", "dbpass10");
+			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "root", "dbpass10"); //Change password to empty
 			Statement st = con.createStatement();
 			ResultSet rs = st.executeQuery("SELECT count(*) FROM web_members");
 			if(rs.next()){
-				System.out.println("LENGTH: " + rs.getInt(1));	
 				length = rs.getInt(1);
 			}
 		}
@@ -108,7 +145,7 @@ class Retrieve {
 			Class.forName("com.mysql.jdbc.Driver");
 			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "root", "dbpass10");
 			Statement st = con.createStatement();
-			rs = st.executeQuery("select * from web_members where id=" + idRow);
+			rs = st.executeQuery("select * from web_members where id=" + idReq);
 		} catch (Exception e) {
 			print("Error: " + e);
 		}
@@ -126,10 +163,10 @@ class Retrieve {
 				lastname = rs.getString("lastname");
 			}
 			String ID = Integer.toString(id);
-			name = name + " " + lastname;
 			text0.setText(ID);
 			text1.setText(name);
-			text2.setText(email);
+			text2.setText(lastname);
+			text3.setText(email);
 		} catch (Exception x) {
 			print("Error: " + x);
 		}
