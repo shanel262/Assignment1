@@ -68,7 +68,6 @@ class Retrieve {
 					text2.setText(lastname);
 					text3.setText(email);
 					maxLength = length();
-//					text0.setVisible(false);
 					text0.setEnabled(false);
 					previous.setEnabled(false);
 					next.setEnabled(false);
@@ -76,7 +75,6 @@ class Retrieve {
 				else{
 					String query = "INSERT into web_members (id, name, lastname, email) values (" + (maxLength + 1) + ", \"" + text1.getText() + "\", \"" + text2.getText() + "\", \"" + text3.getText() + "\");";
 					print(query);
-//					text0.setVisible(true);
 					text0.setEnabled(true);
 					previous.setEnabled(true);
 					next.setEnabled(true);
