@@ -9,6 +9,7 @@ class Retrieve {
 
 	int idRow = 1;
 	int maxLength = 0;
+	int minLength = 0;
 	JFrame f = new JFrame();
 	JLabel label0 = new JLabel("ID: ");
 	JLabel label1 = new JLabel("Name: ");
@@ -47,7 +48,7 @@ class Retrieve {
 		previous.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(idRow > 1){
+				if(idRow > minLength){
 					idRow--;
 					ResultSet rs = load(idRow);
 					parseAndInsert(rs, false);
@@ -179,11 +180,15 @@ class Retrieve {
 		int length = 0;
 		try{
 			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "root", "dbpass10"); //Change password to empty
-			Statement st = con.createStatement();
+			Statement maxSt = con.createStatement();
+			Statement minSt = con.createStatement();
 //			ResultSet rs = st.executeQuery("SELECT count(*) FROM web_members"); //This doesn't work after deleting members that do not have the max id
-			ResultSet rs = st.executeQuery("SELECT * FROM web_members ORDER BY id DESC LIMIT 1");
-			if(rs.next()){
-				length = rs.getInt(1);
+			ResultSet maxRs = maxSt.executeQuery("SELECT * FROM web_members ORDER BY id DESC LIMIT 1");
+			ResultSet minRs = minSt.executeQuery("SELECT * FROM web_members ORDER BY id ASC LIMIT 1");
+			if(maxRs.next() && minRs.next()){
+				length = maxRs.getInt(1);
+				minLength = minRs.getInt(1);
+				print("minLength: " + minLength);
 			}
 		}
 		catch(Exception e){
@@ -226,7 +231,7 @@ class Retrieve {
 				parseAndInsert(rs, direction);
 			}
 			else{
-				print(name + " " + lastname + " " + email);
+				print(id + " " + name + " " + lastname + " " + email);
 				String ID = Integer.toString(id);
 				text0.setText(ID);
 				text1.setText(name);
