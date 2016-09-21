@@ -1,4 +1,8 @@
-
+/**
+ * @author Shane Lacey 20013687
+ * @version 1.0.0
+ * @date 21/9/16
+ */
 //mySQL JDBC GUI connection
 import java.awt.*;
 import java.sql.*;
