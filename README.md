@@ -4,5 +4,4 @@ Assignment 1 for Distributed Systems. A GUI to access mySQL DB. Allows the user 
 # to-do
 - update documentation
 - comment code
-- move db login credentials to single variables
 - change db structure to match assignment spec

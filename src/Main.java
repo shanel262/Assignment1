@@ -28,6 +28,10 @@ class Retrieve {
 	JButton exit = new JButton("Exit");
 	JButton add = new JButton("Add");
 	JButton delete = new JButton("Delete");
+	Connection con;
+	String url = "jdbc:mysql://localhost:3306/test";
+	private String user = "root";
+	private String pass = "";
 
 	public static void main(String[] args) {
 		Retrieve main = new Retrieve();
@@ -38,6 +42,12 @@ class Retrieve {
 	}
 
 	public void run() {
+		try{
+			con = DriverManager.getConnection(url, user, pass);			
+		}
+		catch(Exception e){
+			print("Error: " + e);
+		}
 		next.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -64,6 +74,11 @@ class Retrieve {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				print("Exiting");
+				try {
+					con.close();
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
 				System.exit(0);
 			}
 		});
@@ -89,7 +104,6 @@ class Retrieve {
 					previous.setEnabled(true);
 					next.setEnabled(true);
 					try{
-						Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "root", "dbpass10");
 						Statement st = con.createStatement();
 						int res = st.executeUpdate(query);
 						if(res == 1) print("Update successful");
@@ -125,7 +139,6 @@ class Retrieve {
 			public void actionPerformed(ActionEvent e) {
 				String query = "DELETE FROM `web_members` WHERE id=" + idRow;
 				try{
-					Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "root", "dbpass10");
 					Statement st = con.createStatement();
 					int res = st.executeUpdate(query);
 					if(res == 1) print("Delete successful");
@@ -183,10 +196,8 @@ class Retrieve {
 	public int length(){
 		int length = 0;
 		try{
-			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "root", "dbpass10"); //Change password to empty
 			Statement maxSt = con.createStatement();
 			Statement minSt = con.createStatement();
-//			ResultSet rs = st.executeQuery("SELECT count(*) FROM web_members"); //This doesn't work after deleting members that do not have the max id
 			ResultSet maxRs = maxSt.executeQuery("SELECT * FROM web_members ORDER BY id DESC LIMIT 1");
 			ResultSet minRs = minSt.executeQuery("SELECT * FROM web_members ORDER BY id ASC LIMIT 1");
 			if(maxRs.next() && minRs.next()){
@@ -205,7 +216,6 @@ class Retrieve {
 		ResultSet rs = null;
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
-			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "root", "dbpass10");
 			Statement st = con.createStatement();
 			rs = st.executeQuery("select * from web_members where id=" + idReq);
 		} catch (Exception e) {
