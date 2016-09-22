@@ -1,7 +1,7 @@
 /**
  * @author Shane Lacey 20013687
  * @version 1.0.0
- * @date 21/9/16
+ * @date 22/9/16
  */
 //mySQL JDBC GUI connection
 import java.awt.*;
@@ -15,14 +15,16 @@ class Retrieve {
 	int maxLength = 0;
 	int minLength = 0;
 	JFrame f = new JFrame();
-	JLabel label0 = new JLabel("ID: ");
-	JLabel label1 = new JLabel("Name: ");
-	JLabel label2 = new JLabel("Lastname: ");
-	JLabel label3 = new JLabel("Email: ");
-	JTextField text0 = new JTextField(20);
-	JTextField text1 = new JTextField(20);
+	JLabel label0 = new JLabel("Name: ");
+	JLabel label1 = new JLabel("Address: ");
+	JLabel label2 = new JLabel("Salary: ");
+	JLabel label3 = new JLabel("Sex: ");
+	JLabel label4 = new JLabel("Date of Birth: ");
+	JTextField text0 = new JTextField(80);
+	JTextField text1 = new JTextField(160);
 	JTextField text2 = new JTextField(20);
 	JTextField text3 = new JTextField(20);
+	JTextField text4 = new JTextField(20);
 	JButton previous = new JButton("Previous");
 	JButton next = new JButton("Next");
 	JButton exit = new JButton("Exit");
@@ -84,30 +86,28 @@ class Retrieve {
 		});
 		
 		add.addActionListener(new ActionListener() {
-			String id = "", name = "", lastname = "", email = "";
+			String name = "", address = "", salary = "", sex = "", dob = "";
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if(previous.isEnabled()){
-					text0.setText(id);
-					text1.setText(name);
-					text2.setText(lastname);
-					text3.setText(email);
+					text0.setText(name);
+					text1.setText(address);
+					text2.setText(salary);
+					text3.setText(sex);
+					text4.setText(dob);
 					maxLength = length();
-					text0.setEnabled(false);
 					previous.setEnabled(false);
 					next.setEnabled(false);
 				}
-				else if(!text1.getText().isEmpty() && !text2.getText().isEmpty()){
-					String query = "INSERT into web_members (id, name, lastname, email) values (" + (maxLength + 1) + ", \"" + text1.getText() + "\", \"" + text2.getText() + "\", \"" + text3.getText() + "\");";
-					print(query);
-					text0.setEnabled(true);
+				else if(!text0.getText().isEmpty() && !text1.getText().isEmpty() && !text2.getText().isEmpty() && !text3.getText().isEmpty() && !text4.getText().isEmpty()){
+					String query = "INSERT into Employee (Ssn, Name, Address, Salary, Sex, Bdate) values (" + (maxLength + 1) + ", \"" + text0.getText() + "\", \"" + text1.getText() + "\", \"" + text2.getText() + "\", \"" + text3.getText()+ "\", \"" + text4.getText()  + "\");";
 					previous.setEnabled(true);
 					next.setEnabled(true);
 					try{
 						Statement st = con.createStatement();
 						int res = st.executeUpdate(query);
-						if(res == 1) print("Update successful");
-						else print("Update unsuccessful");
+						if(res == 1) print("Add successful");
+						else print("Add unsuccessful");
 						maxLength = length();
 						idRow = maxLength;
 						ResultSet rs = load(maxLength);
@@ -117,12 +117,14 @@ class Retrieve {
 						maxLength = length();
 						ResultSet rs = load(maxLength);
 						parseAndInsert(rs, true);
-						print("Error: " + x);
+						print("Error: " + x.getMessage());
+						if(x.getMessage().contains("Incorrect date value")){
+							JOptionPane.showMessageDialog(null, "Incorrect date value, please use the format yyyy-mm-dd");
+						}
 					}
 				}
 				else{
-					print("Please enter a full name");
-					text0.setEnabled(true);
+					JOptionPane.showMessageDialog(null, "Please fill in all fields");
 					previous.setEnabled(true);
 					next.setEnabled(true);
 					maxLength = length();
@@ -137,7 +139,7 @@ class Retrieve {
 		delete.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String query = "DELETE FROM `web_members` WHERE id=" + idRow;
+				String query = "DELETE FROM `Employee` WHERE Ssn=" + idRow;
 				try{
 					Statement st = con.createStatement();
 					int res = st.executeUpdate(query);
@@ -150,7 +152,7 @@ class Retrieve {
 						parseAndInsert(rs, false);						
 					}
 					else{
-						text0.setText(""); text1.setText(""); text2.setText(""); text3.setText("");
+						text0.setText(""); text1.setText(""); text2.setText(""); text3.setText(""); text4.setText("");
 					}
 				}
 				catch(Exception x){
@@ -171,7 +173,7 @@ class Retrieve {
 		
 		f.setPreferredSize(new Dimension(700, 200));
 		JPanel master = new JPanel(new GridLayout(1, 2));
-		JPanel info = new JPanel(new GridLayout(4, 2));
+		JPanel info = new JPanel(new GridLayout(5, 2));
 		JPanel buttons = new JPanel(new GridLayout(5, 1));
 		master.add(info);
 		master.add(buttons);
@@ -183,6 +185,8 @@ class Retrieve {
 		info.add(text2);
 		info.add(label3);
 		info.add(text3);
+		info.add(label4);
+		info.add(text4);
 		buttons.add(previous);
 		buttons.add(next);
 		buttons.add(add);
@@ -198,8 +202,8 @@ class Retrieve {
 		try{
 			Statement maxSt = con.createStatement();
 			Statement minSt = con.createStatement();
-			ResultSet maxRs = maxSt.executeQuery("SELECT * FROM web_members ORDER BY id DESC LIMIT 1");
-			ResultSet minRs = minSt.executeQuery("SELECT * FROM web_members ORDER BY id ASC LIMIT 1");
+			ResultSet maxRs = maxSt.executeQuery("SELECT * FROM Employee ORDER BY Ssn DESC LIMIT 1");
+			ResultSet minRs = minSt.executeQuery("SELECT * FROM Employee ORDER BY Ssn ASC LIMIT 1");
 			if(maxRs.next() && minRs.next()){
 				length = maxRs.getInt(1);
 				minLength = minRs.getInt(1);
@@ -217,7 +221,7 @@ class Retrieve {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			Statement st = con.createStatement();
-			rs = st.executeQuery("select * from web_members where id=" + idReq);
+			rs = st.executeQuery("select * from Employee where Ssn=" + idReq);
 		} catch (Exception e) {
 			print("Error: " + e);
 		}
@@ -226,13 +230,15 @@ class Retrieve {
 
 	public void parseAndInsert(ResultSet rs, boolean direction) { // direction == true means right. direction == false means left
 		try {
-			String name = "", email = "", lastname = "";
+			String name = "", address = "", salary = "", sex = "", dob = "";
 			int id = 0;
 			if (rs.next()) {
-				id = rs.getInt("id");
-				name = rs.getString("name");
-				email = rs.getString("email");
-				lastname = rs.getString("lastname");
+				id = rs.getInt("Ssn");
+				name = rs.getString("Name");
+				address = rs.getString("Address");
+				salary = rs.getString("Salary");
+				sex = rs.getString("Sex");
+				dob = rs.getString("Bdate");
 			}
 			if(id == 0 && direction){
 				idRow = idRow++ <= maxLength ? idRow++ : idRow--;
@@ -245,12 +251,12 @@ class Retrieve {
 				parseAndInsert(rs, direction);
 			}
 			else{
-				print(id + " " + name + " " + lastname + " " + email);
-				String ID = Integer.toString(id);
-				text0.setText(ID);
-				text1.setText(name);
-				text2.setText(lastname);
-				text3.setText(email);				
+				print(id + " " + name + " " + address + " " + salary + " " + sex + " " + dob);
+				text0.setText(name);
+				text1.setText(address);
+				text2.setText(salary);
+				text3.setText(sex);
+				text4.setText(dob);
 			}
 		} catch (Exception x) {
 			print("Error: " + x);
