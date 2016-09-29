@@ -8,12 +8,18 @@ The java file contains three settings for connecting to the database:
 - and the password (called pass)
 
 # How to use it
+## IMPORTANT INFO
+The database assumes a unique Ssn is applied to each record and uses it to scroll trough the users db. I have included a text file with 10 insert queries in case you do not have unique Ssn numbers.
+
 ## Scrolling (Next and previous)
 The user can scroll through the db using the next and previous buttons.
 
-## Adding a user
+## Adding a user (static record)
+The user can add a static record by pressing the add button. To enable the feature to add a custom record, uncomment the feature and comment out the static entry code.
+
+### Adding a user (commented out code)
 The user can add a new user by pressing the 'Add' button. When this happens the 'Add' button changes to 'Confirm' so the user knows to click there when they are done inserting the new users details. 
-### Some rules
+#### Some rules
 - __All fields must be filled in.__
 - __The Salary field must contain a number__
 - __The date field must be in the format YYYY-MM-DD or YYYY/MM/DD__
