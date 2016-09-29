@@ -8,7 +8,7 @@ The java file contains three settings for connecting to the database:
 - and the password (called pass)
 
 # How to use it
-## IMPORTANT INFO
+## IMPORTANT INFORMATION
 The database assumes a unique Ssn is applied to each record and uses it to scroll trough the users db. I have included a text file with 10 insert queries in case you do not have unique Ssn numbers.
 
 ## Scrolling (Next and previous)
