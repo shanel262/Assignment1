@@ -89,62 +89,92 @@ class Retrieve {
 			String name = "", address = "", salary = "", sex = "", dob = "";
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(previous.isEnabled()){ // When the add button is pressed, the next and previous buttons are disabled, this determines if this is the first or second click of 'Add'
-					text0.setText(name);
-					text1.setText(address);
-					text2.setText(salary);
-					text3.setText(sex);
-					text4.setText(dob);
-					maxLength = length();
-					previous.setEnabled(false); // Next, previous and delete buttons are disabled when adding a new user
-					next.setEnabled(false);
-					delete.setEnabled(false);
-					add.setText("Confirm"); // Changes the 'Add' button to 'Confirm'
-				}
-				else if(!text0.getText().isEmpty() && !text1.getText().isEmpty() && !text2.getText().isEmpty() && !text3.getText().isEmpty() && !text4.getText().isEmpty()){ // Checks all fields have values
-					String query = "INSERT into Employee (Ssn, Name, Address, Salary, Sex, Bdate) values (" + (maxLength + 1) + ", \"" + text0.getText() + "\", \"" + text1.getText() + "\", \"" + text2.getText() + "\", \"" + text3.getText()+ "\", \"" + text4.getText()  + "\");";
-					previous.setEnabled(true); // Enables the next, previous and delete buttons after clicking confirm to add a user.
-					next.setEnabled(true);
-					delete.setEnabled(true);
-					add.setText("Add");
-					try{
-						Statement st = con.createStatement(); // Create a statement object
-						int res = st.executeUpdate(query); // Execute the query and collect the response
-						if(res == 1){ // Check the add was successful
-							print("Add successful");
-							JOptionPane.showMessageDialog(null, "User added");
-						}
-						else print("Add unsuccessful");
-						maxLength = length(); // Updates the highest Ssn value
-						idRow = maxLength; // Updates current row
-						ResultSet rs = load(maxLength); // Get record for current row
-						parseAndInsert(rs, true); // Parse and insert data for current row
+				/**
+				 * The commented out code below is used to add a custom user, uncomment it and comment out the static code below it to use it.
+				 */
+//				if(previous.isEnabled()){ // When the add button is pressed, the next and previous buttons are disabled, this determines if this is the first or second click of 'Add'
+//					text0.setText(name);
+//					text1.setText(address);
+//					text2.setText(salary);
+//					text3.setText(sex);
+//					text4.setText(dob);
+//					maxLength = length();
+//					previous.setEnabled(false); // Next, previous and delete buttons are disabled when adding a new user
+//					next.setEnabled(false);
+//					delete.setEnabled(false);
+//					add.setText("Confirm"); // Changes the 'Add' button to 'Confirm'
+//				}
+//				else if(!text0.getText().isEmpty() && !text1.getText().isEmpty() && !text2.getText().isEmpty() && !text3.getText().isEmpty() && !text4.getText().isEmpty()){ // Checks all fields have values
+//					String query = "INSERT into Employee (Ssn, Name, Address, Salary, Sex, Bdate) values (" + (maxLength + 1) + ", \"" + text0.getText() + "\", \"" + text1.getText() + "\", \"" + text2.getText() + "\", \"" + text3.getText()+ "\", \"" + text4.getText()  + "\");";
+//					previous.setEnabled(true); // Enables the next, previous and delete buttons after clicking confirm to add a user.
+//					next.setEnabled(true);
+//					delete.setEnabled(true);
+//					add.setText("Add");
+//					try{
+//						Statement st = con.createStatement(); // Create a statement object
+//						int res = st.executeUpdate(query); // Execute the query and collect the response
+//						if(res == 1){ // Check the add was successful
+//							print("Add successful");
+//							JOptionPane.showMessageDialog(null, "User added");
+//						}
+//						else print("Add unsuccessful");
+//						maxLength = length(); // Updates the highest Ssn value
+//						idRow = maxLength; // Updates current row
+//						ResultSet rs = load(maxLength); // Get record for current row
+//						parseAndInsert(rs, true); // Parse and insert data for current row
+//					}
+//					catch(Exception x){
+//						maxLength = length();
+//						ResultSet rs = load(maxLength);
+//						parseAndInsert(rs, true);
+//						print("Error: " + x.getMessage());
+//						if(x.getMessage().contains("Incorrect date value")){ // If the date is entered incorrectly, throw this error
+//							JOptionPane.showMessageDialog(null, "Incorrect date value, please use the format yyyy-mm-dd");
+//						}
+//						else if(x.getMessage().contains("Incorrect decimal value")){ // If the salary is entered incorrectly, throw this error
+//							JOptionPane.showMessageDialog(null, "Incorrect decimal value, please enter a number for salary");
+//						}
+//					}
+//				}
+//				else{
+//					JOptionPane.showMessageDialog(null, "Please fill in all fields");
+//					previous.setEnabled(true); //Enable all buttons
+//					next.setEnabled(true);
+//					delete.setEnabled(true);
+//					add.setText("Add"); // Change name from 'Confirm' to 'Add'
+//					maxLength = length();
+//					idRow = maxLength;
+//					ResultSet rs = load(maxLength);
+//					parseAndInsert(rs, true);
+//					
+//				}
+				
+				/*
+				 * The section below enters a static user when the add button is pressed.
+				 */
+				maxLength = length();
+				String query = "INSERT into Employee (Ssn, Name, Address, Salary, Sex, Bdate, Works_for, Manages, Supervises) values (" + (maxLength + 1) + ", \"" + ("John Green" + (maxLength + 1)) + "\", \"" + "Waterford" + "\", \"" + 24000 + "\", \"" + "Male" + "\", \"" + "2012/12/01" + "\", \"" + 1 + "\", \"" + 2 + "\", \"" + 3 + "\");";
+				print("QUERY: " + query);
+				try{
+					Statement st = con.createStatement(); // Create a statement object
+					int res = st.executeUpdate(query); // Execute the query and collect the response
+					if(res == 1){ // Check the add was successful
+						print("Add successful");
+						JOptionPane.showMessageDialog(null, "User added");
 					}
-					catch(Exception x){
-						maxLength = length();
-						ResultSet rs = load(maxLength);
-						parseAndInsert(rs, true);
-						print("Error: " + x.getMessage());
-						if(x.getMessage().contains("Incorrect date value")){ // If the date is entered incorrectly, throw this error
-							JOptionPane.showMessageDialog(null, "Incorrect date value, please use the format yyyy-mm-dd");
-						}
-						else if(x.getMessage().contains("Incorrect decimal value")){ // If the salary is entered incorrectly, throw this error
-							JOptionPane.showMessageDialog(null, "Incorrect decimal value, please enter a number for salary");
-						}
-					}
+					else print("Add unsuccessful");
+					maxLength = length(); // Updates the highest Ssn value
+					idRow = maxLength; // Updates current row
+					ResultSet rs = load(maxLength); // Get record for current row
+					parseAndInsert(rs, true); // Parse and insert data for current row
 				}
-				else{
-					JOptionPane.showMessageDialog(null, "Please fill in all fields");
-					previous.setEnabled(true); //Enable all buttons
-					next.setEnabled(true);
-					delete.setEnabled(true);
-					add.setText("Add"); // Change name from 'Confirm' to 'Add'
+				catch(Exception x){
 					maxLength = length();
-					idRow = maxLength;
 					ResultSet rs = load(maxLength);
 					parseAndInsert(rs, true);
-					
+					print("Error: " + x.getMessage());
 				}
+				
 			}
 		});
 		
